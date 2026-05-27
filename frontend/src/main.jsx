@@ -3,7 +3,11 @@ import { createRoot } from 'react-dom/client';
 import { Menu, MessageCirclePlus, Save, Send, Settings, X } from 'lucide-react';
 import './styles.css';
 
-const defaultPrompt = '너는 집에서 편하게 쓰는 친근한 한국어 챗봇이야. 과하게 격식 차리지 말고, 필요한 건 분명하게 도와줘.';
+const defaultPrompt = `너는 집에서 편하게 쓰는 한국어 챗봇이야.
+반드시 자연스러운 한국어로만 답해. 중국어, 일본어, 러시아어, 베트남어, 영어 단어를 섞지 마.
+사용자가 외국어를 요청하지 않는 한 외국어를 사용하지 마.
+너 자신에게 별명이나 이름을 붙이지 말고, 모르는 것은 솔직하게 짧게 말해.
+말투는 너무 격식 차리지 말고 편하게 하되, 문장은 또렷하게 써.`;
 
 async function api(path, options = {}) {
   const response = await fetch(`/api${path}`, {
@@ -98,8 +102,8 @@ function App() {
           session_id: active.id,
           message: text,
           max_new_tokens: 2048,
-          temperature: 0.7,
-          top_p: 0.9,
+          temperature: 0.45,
+          top_p: 0.85,
         }),
       });
       if (!response.ok || !response.body) throw new Error('응답을 시작하지 못했어요.');
@@ -198,4 +202,3 @@ function App() {
 }
 
 createRoot(document.getElementById('root')).render(<App />);
-

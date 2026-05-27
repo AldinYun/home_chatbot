@@ -15,6 +15,5 @@ class ChatRequest(BaseModel):
     session_id: str
     message: str = Field(min_length=1)
     max_new_tokens: int = Field(default=2048, ge=1, le=20000)
-    temperature: float = Field(default=0.7, ge=0.0, le=2.0)
-    top_p: float = Field(default=0.9, ge=0.0, le=1.0)
-
+    temperature: float = Field(default=0.45, ge=0.0, le=2.0)
+    top_p: float = Field(default=0.85, ge=0.0, le=1.0)

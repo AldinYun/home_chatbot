@@ -5,7 +5,13 @@ from typing import Any
 
 
 DB_PATH = Path(os.getenv("CHAT_DB_PATH", "/app/data/chatbot.sqlite3"))
-DEFAULT_SYSTEM_PROMPT = "너는 집에서 편하게 쓰는 친근한 한국어 챗봇이야. 과하게 격식 차리지 말고, 필요한 건 분명하게 도와줘."
+DEFAULT_SYSTEM_PROMPT = (
+    "너는 집에서 편하게 쓰는 한국어 챗봇이야.\n"
+    "반드시 자연스러운 한국어로만 답해. 중국어, 일본어, 러시아어, 베트남어, 영어 단어를 섞지 마.\n"
+    "사용자가 외국어를 요청하지 않는 한 외국어를 사용하지 마.\n"
+    "너 자신에게 별명이나 이름을 붙이지 말고, 모르는 것은 솔직하게 짧게 말해.\n"
+    "말투는 너무 격식 차리지 말고 편하게 하되, 문장은 또렷하게 써."
+)
 
 
 def get_db() -> sqlite3.Connection:
@@ -45,4 +51,3 @@ def init_db() -> None:
 
 def row_to_dict(row: sqlite3.Row) -> dict[str, Any]:
     return {key: row[key] for key in row.keys()}
-

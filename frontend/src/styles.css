@@ -5,14 +5,19 @@
 }
 
 * { box-sizing: border-box; }
-body { margin: 0; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  overflow: hidden;
+}
 button, textarea { font: inherit; }
 button { cursor: pointer; }
 
 main {
   display: grid;
   grid-template-columns: 300px minmax(0, 1fr);
-  min-height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
 }
 
 aside {
@@ -22,6 +27,8 @@ aside {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  height: 100dvh;
+  min-height: 0;
 }
 
 .sideTop {
@@ -52,6 +59,7 @@ aside {
   display: grid;
   gap: 8px;
   overflow: auto;
+  min-height: 0;
 }
 
 .session {
@@ -88,6 +96,9 @@ aside {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto auto;
   min-width: 0;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
 }
 
 header {
@@ -99,6 +110,7 @@ header {
   border-bottom: 1px solid #ded9d0;
   background: rgba(255,255,255,.7);
   backdrop-filter: blur(10px);
+  z-index: 5;
 }
 
 h1, h2, p { margin: 0; }
@@ -107,6 +119,7 @@ header p { color: #66717b; margin-top: 3px; }
 
 .messages {
   overflow: auto;
+  min-height: 0;
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -280,4 +293,3 @@ header p { color: #66717b; margin-top: 3px; }
     padding: 12px;
   }
 }
-

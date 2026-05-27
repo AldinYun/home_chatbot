@@ -3,6 +3,6 @@ uvicorn[standard]==0.34.0
 pydantic==2.10.5
 transformers==4.47.1
 accelerate==1.2.1
+bitsandbytes==0.45.0
 sentencepiece==0.2.0
 protobuf==5.29.2
-

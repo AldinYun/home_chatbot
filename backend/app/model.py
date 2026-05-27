@@ -3,12 +3,13 @@ from threading import Thread
 from typing import Iterable
 
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, TextIteratorStreamer
 
 
-MODEL_ID = os.getenv("MODEL_ID", "meta-llama/Llama-3.2-3B-Instruct")
+MODEL_ID = os.getenv("MODEL_ID", "kakaocorp/kanana-1.5-8b-instruct-2505")
 MAX_CONTEXT_TOKENS = int(os.getenv("MAX_CONTEXT_TOKENS", "20000"))
 GPU_DEVICE = os.getenv("GPU_DEVICE", "1")
+LOAD_IN_4BIT = os.getenv("LOAD_IN_4BIT", "true").lower() == "true"
 
 _tokenizer = None
 _model = None
@@ -34,12 +35,21 @@ def load_model():
     device = get_device()
     dtype = torch.float16 if device.startswith("cuda") else torch.float32
     _tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
-    _model = AutoModelForCausalLM.from_pretrained(
-        MODEL_ID,
-        torch_dtype=dtype,
-        low_cpu_mem_usage=True,
-    )
-    _model.to(device)
+    model_kwargs = {
+        "torch_dtype": dtype,
+        "low_cpu_mem_usage": True,
+    }
+    if device.startswith("cuda") and LOAD_IN_4BIT:
+        model_kwargs["quantization_config"] = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_compute_dtype=torch.float16,
+            bnb_4bit_use_double_quant=True,
+        )
+        model_kwargs["device_map"] = {"": device}
+    _model = AutoModelForCausalLM.from_pretrained(MODEL_ID, **model_kwargs)
+    if not (device.startswith("cuda") and LOAD_IN_4BIT):
+        _model.to(device)
     _model.eval()
     return _tokenizer, _model
 
@@ -81,6 +91,7 @@ def stream_chat(system_prompt: str, history: list[dict], user_message: str, max_
         "max_new_tokens": max_new_tokens,
         "temperature": temperature,
         "top_p": top_p,
+        "repetition_penalty": 1.08,
         "do_sample": temperature > 0,
         "pad_token_id": tokenizer.eos_token_id,
     }
@@ -88,4 +99,3 @@ def stream_chat(system_prompt: str, history: list[dict], user_message: str, max_
     thread.start()
     yield from streamer
     thread.join()
-
