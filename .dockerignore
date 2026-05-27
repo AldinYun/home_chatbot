@@ -1,0 +1,8 @@
+.git
+frontend/node_modules
+frontend/dist
+data
+hf_cache
+*.tar
+backend/**/__pycache__
+

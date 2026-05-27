@@ -1,0 +1,15 @@
+__pycache__/
+.pytest_cache/
+.venv/
+venv/
+node_modules/
+dist/
+build/
+data/
+hf_cache/
+*.pyc
+*.tar
+.env
+.env.*
+!.env.example
+
