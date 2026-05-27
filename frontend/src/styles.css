@@ -1,7 +1,8 @@
 :root {
-  color: #1f252b;
-  background: #f4f2ee;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #20242a;
+  background: #eef1f4;
+  font-family: "Pretendard Variable", Pretendard, "Noto Sans KR", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 16px;
 }
 
 * { box-sizing: border-box; }
@@ -15,20 +16,24 @@ button { cursor: pointer; }
 
 main {
   display: grid;
-  grid-template-columns: 300px minmax(0, 1fr);
+  grid-template-columns: 312px minmax(0, 1fr);
   height: 100dvh;
   overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(112, 167, 191, .18), transparent 32%),
+    linear-gradient(135deg, #f6f7f8 0%, #e9edf1 100%);
 }
 
 aside {
-  background: #24292f;
+  background: linear-gradient(180deg, #171c24 0%, #232b36 100%);
   color: #ffffff;
-  padding: 18px;
+  padding: 18px 16px;
   display: flex;
   flex-direction: column;
   gap: 16px;
   height: 100dvh;
   min-height: 0;
+  border-right: 1px solid rgba(255,255,255,.08);
 }
 
 .sideTop {
@@ -39,8 +44,9 @@ aside {
 
 .logo {
   font-weight: 800;
-  font-size: 22px;
-  letter-spacing: .2px;
+  font-size: 21px;
+  letter-spacing: .1px;
+  color: #f8fafc;
 }
 
 .newChat, .promptBtn, .saveBtn {
@@ -50,9 +56,17 @@ aside {
   gap: 8px;
   border: 0;
   border-radius: 8px;
-  background: #4b7f52;
+  background: #4f7f7a;
   color: white;
   padding: 11px 14px;
+  box-shadow: 0 8px 22px rgba(49, 95, 114, .18);
+  transition: transform .12s ease, background .12s ease, box-shadow .12s ease;
+}
+
+.newChat:hover, .promptBtn:hover, .saveBtn:hover {
+  background: #426f6a;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(49, 95, 114, .22);
 }
 
 .sessionList {
@@ -63,22 +77,28 @@ aside {
 }
 
 .session {
+  position: relative;
   display: grid;
   gap: 4px;
   text-align: left;
-  border: 1px solid rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.08);
   border-radius: 8px;
-  background: rgba(255,255,255,.06);
+  background: rgba(255,255,255,.045);
   color: white;
-  padding: 11px;
+  padding: 12px 40px 12px 12px;
+  transition: background .12s ease, border-color .12s ease;
+}
+
+.session:hover {
+  background: rgba(255,255,255,.08);
 }
 
 .session.active {
-  border-color: #9ec7a4;
-  background: rgba(158,199,164,.18);
+  border-color: rgba(128, 196, 187, .72);
+  background: rgba(93, 154, 146, .2);
 }
 
-.session span {
+.sessionTitle {
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
@@ -90,6 +110,24 @@ aside {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.deleteSession {
+  position: absolute;
+  top: 11px;
+  right: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  color: rgba(255,255,255,.58);
+}
+
+.deleteSession:hover {
+  color: #ffe7e3;
+  background: rgba(255, 118, 104, .16);
 }
 
 .chat {
@@ -106,24 +144,47 @@ header {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 18px 24px;
-  border-bottom: 1px solid #ded9d0;
-  background: rgba(255,255,255,.7);
+  padding: 18px 26px;
+  border-bottom: 1px solid rgba(154, 165, 177, .24);
+  background: rgba(255,255,255,.82);
   backdrop-filter: blur(10px);
   z-index: 5;
 }
 
 h1, h2, p { margin: 0; }
-h1 { font-size: 22px; }
+h1 { font-size: 22px; letter-spacing: 0; }
 header p { color: #66717b; margin-top: 3px; }
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.memoryToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  color: #43505b;
+  background: rgba(255,255,255,.78);
+  border: 1px solid rgba(171, 182, 193, .46);
+  border-radius: 999px;
+  padding: 9px 12px;
+  font-size: 14px;
+}
+
+.memoryToggle input {
+  accent-color: #225d75;
+}
 
 .messages {
   overflow: auto;
   min-height: 0;
-  padding: 24px;
+  padding: 28px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .empty {
@@ -140,26 +201,67 @@ header p { color: #66717b; margin-top: 3px; }
 }
 
 .bubble {
-  max-width: min(760px, 82%);
+  max-width: min(820px, 82%);
   line-height: 1.6;
   white-space: pre-wrap;
   word-break: break-word;
-  border-radius: 14px;
-  padding: 13px 15px;
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: 0 10px 28px rgba(31, 36, 43, .07);
 }
 
 .bubble.user {
   align-self: flex-end;
-  background: #315f72;
+  background: linear-gradient(135deg, #225d75 0%, #2f7184 100%);
   color: white;
-  border-bottom-right-radius: 4px;
+  border-bottom-right-radius: 5px;
 }
 
 .bubble.assistant {
   align-self: flex-start;
-  background: #ffffff;
-  border: 1px solid #e0dbd3;
-  border-bottom-left-radius: 4px;
+  background: rgba(255,255,255,.9);
+  border: 1px solid rgba(211, 218, 224, .9);
+  border-bottom-left-radius: 5px;
+}
+
+.markdown > :first-child { margin-top: 0; }
+.markdown > :last-child { margin-bottom: 0; }
+.markdown p { margin: 0 0 10px; }
+.markdown ul, .markdown ol { margin: 8px 0 10px 22px; padding: 0; }
+.markdown li { margin: 4px 0; }
+.markdown code {
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  background: rgba(30, 38, 46, .08);
+  border-radius: 5px;
+  padding: 2px 5px;
+  font-size: .92em;
+}
+.markdown pre {
+  overflow: auto;
+  background: #141a22;
+  color: #e8edf2;
+  border-radius: 10px;
+  padding: 13px;
+  white-space: pre;
+}
+.markdown pre code {
+  background: transparent;
+  padding: 0;
+}
+.markdown blockquote {
+  margin: 10px 0;
+  padding-left: 12px;
+  border-left: 3px solid #83a9b8;
+  color: #53616c;
+}
+.markdown table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 10px 0;
+}
+.markdown th, .markdown td {
+  border: 1px solid #d7dde3;
+  padding: 7px 8px;
 }
 
 .typing {
@@ -171,24 +273,27 @@ header p { color: #66717b; margin-top: 3px; }
   display: grid;
   grid-template-columns: minmax(0, 1fr) 52px;
   gap: 10px;
-  padding: 16px 24px 22px;
-  background: #f4f2ee;
+  padding: 16px 26px 24px;
+  background: rgba(246, 247, 248, .92);
+  border-top: 1px solid rgba(154, 165, 177, .22);
 }
 
 .composer textarea {
   min-height: 54px;
   max-height: 180px;
   resize: vertical;
-  border: 1px solid #d5d0c7;
-  border-radius: 10px;
+  border: 1px solid rgba(171, 182, 193, .62);
+  border-radius: 14px;
   padding: 14px;
   outline: none;
+  background: rgba(255,255,255,.94);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
 }
 
 .composer button, .iconBtn {
   border: 0;
-  border-radius: 10px;
-  background: #315f72;
+  border-radius: 12px;
+  background: #225d75;
   color: white;
 }
 
@@ -226,7 +331,7 @@ header p { color: #66717b; margin-top: 3px; }
 .modal {
   width: min(720px, 100%);
   background: #ffffff;
-  border-radius: 10px;
+  border-radius: 14px;
   padding: 18px;
   box-shadow: 0 24px 80px rgba(0,0,0,.24);
 }
@@ -278,6 +383,15 @@ header p { color: #66717b; margin-top: 3px; }
     font-size: 18px;
   }
   .promptBtn {
+    padding: 10px;
+  }
+  .headerActions {
+    gap: 8px;
+  }
+  .memoryToggle span {
+    display: none;
+  }
+  .memoryToggle {
     padding: 10px;
   }
   .promptBtn svg {

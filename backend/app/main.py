@@ -68,7 +68,7 @@ def chat(payload: ChatRequest) -> StreamingResponse:
     session = get_session(payload.session_id)
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
-    history = list_messages(payload.session_id)
+    history = list_messages(payload.session_id) if payload.include_history else []
     add_message(payload.session_id, "user", payload.message)
     maybe_title_session(payload.session_id, payload.message)
 
@@ -92,4 +92,3 @@ def chat(payload: ChatRequest) -> StreamingResponse:
 static_dir = Path(__file__).resolve().parents[2] / "frontend" / "dist"
 if static_dir.exists():
     app.mount("/", StaticFiles(directory=static_dir, html=True), name="frontend")
-

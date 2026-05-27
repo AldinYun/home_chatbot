@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Menu, MessageCirclePlus, Save, Send, Settings, X } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { Menu, MessageCirclePlus, Save, Send, Settings, Trash2, X } from 'lucide-react';
 import './styles.css';
 
 const defaultPrompt = `너는 집에서 편하게 쓰는 한국어 챗봇이야.
@@ -30,6 +32,7 @@ function App() {
   const [promptOpen, setPromptOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [streaming, setStreaming] = useState(false);
+  const [includeHistory, setIncludeHistory] = useState(true);
   const [error, setError] = useState('');
   const bottomRef = useRef(null);
 
@@ -74,6 +77,23 @@ function App() {
     setSidebarOpen(false);
   }
 
+  async function deleteSession(id, event) {
+    event.stopPropagation();
+    if (!window.confirm('이 대화를 삭제할까요?')) return;
+    await api(`/sessions/${id}`, { method: 'DELETE' });
+    const payload = await api('/sessions');
+    setSessions(payload.sessions);
+    if (active?.id === id) {
+      if (payload.sessions.length) {
+        await openSession(payload.sessions[0].id);
+      } else {
+        setActive(null);
+        setMessages([]);
+        await newChat();
+      }
+    }
+  }
+
   async function savePrompt() {
     if (!active) return;
     const session = await api(`/sessions/${active.id}`, {
@@ -101,6 +121,7 @@ function App() {
         body: JSON.stringify({
           session_id: active.id,
           message: text,
+          include_history: includeHistory,
           max_new_tokens: 2048,
           temperature: 0,
           top_p: 1,
@@ -145,8 +166,11 @@ function App() {
         <div className="sessionList">
           {sessions.map((session) => (
             <button key={session.id} className={active?.id === session.id ? 'session active' : 'session'} onClick={() => openSession(session.id)}>
-              <span>{session.title}</span>
+              <span className="sessionTitle">{session.title}</span>
               <small>{session.last_message || '아직 조용함'}</small>
+              <span className="deleteSession" onClick={(event) => deleteSession(session.id, event)} title="대화 삭제">
+                <Trash2 size={15} />
+              </span>
             </button>
           ))}
         </div>
@@ -157,9 +181,15 @@ function App() {
           <button className="iconBtn mobileOnly" onClick={() => setSidebarOpen(true)}><Menu size={20} /></button>
           <div>
             <h1>{active?.title || '새 대화'}</h1>
-            <p>Llama 3.2 3B · streaming</p>
+            <p>Kanana 1.5 8B · streaming · {includeHistory ? '멀티턴 ON' : '단발 질문'}</p>
           </div>
-          <button className="promptBtn" onClick={() => setPromptOpen(true)}><Settings size={17} /> 시스템 프롬프트</button>
+          <div className="headerActions">
+            <label className="memoryToggle">
+              <input type="checkbox" checked={includeHistory} onChange={(event) => setIncludeHistory(event.target.checked)} />
+              <span>맥락 기억</span>
+            </label>
+            <button className="promptBtn" onClick={() => setPromptOpen(true)}><Settings size={17} /> 시스템 프롬프트</button>
+          </div>
         </header>
 
         <div className="messages">
@@ -171,7 +201,9 @@ function App() {
           )}
           {messages.map((message, index) => (
             <div className={`bubble ${message.role}`} key={`${message.role}-${index}`}>
-              <div>{message.content}</div>
+              <div className="markdown">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
+              </div>
             </div>
           ))}
           {streaming && <div className="typing">생각 중...</div>}
