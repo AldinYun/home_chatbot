@@ -77,24 +77,30 @@ def trim_to_context(tokenizer, messages: list[dict]) -> list[dict]:
 
 def stream_chat(system_prompt: str, history: list[dict], user_message: str, max_new_tokens: int, temperature: float, top_p: float) -> Iterable[str]:
     tokenizer, model = load_model()
+    if tokenizer.pad_token_id is None:
+        tokenizer.pad_token_id = tokenizer.eos_token_id
     messages = trim_to_context(tokenizer, build_chat_messages(system_prompt, history, user_message))
-    inputs = tokenizer.apply_chat_template(
+    input_ids = tokenizer.apply_chat_template(
         messages,
         add_generation_prompt=True,
         return_tensors="pt",
         tokenize=True,
     ).to(model.device)
+    attention_mask = torch.ones_like(input_ids, device=model.device)
     streamer = TextIteratorStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
+    do_sample = temperature > 0
     kwargs = {
-        "input_ids": inputs,
+        "input_ids": input_ids,
+        "attention_mask": attention_mask,
         "streamer": streamer,
         "max_new_tokens": max_new_tokens,
-        "temperature": temperature,
-        "top_p": top_p,
         "repetition_penalty": 1.08,
-        "do_sample": temperature > 0,
+        "do_sample": do_sample,
         "pad_token_id": tokenizer.eos_token_id,
     }
+    if do_sample:
+        kwargs["temperature"] = temperature
+        kwargs["top_p"] = top_p
     thread = Thread(target=model.generate, kwargs=kwargs)
     thread.start()
     yield from streamer

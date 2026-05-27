@@ -102,8 +102,8 @@ function App() {
           session_id: active.id,
           message: text,
           max_new_tokens: 2048,
-          temperature: 0.45,
-          top_p: 0.85,
+          temperature: 0,
+          top_p: 1,
         }),
       });
       if (!response.ok || !response.body) throw new Error('응답을 시작하지 못했어요.');
